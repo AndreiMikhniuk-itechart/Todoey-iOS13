@@ -9,12 +9,14 @@
 import UIKit
 
 class TodoListViewController: UITableViewController{
-    
-    var itemArray = ["Item 1", "Item 2", "Item 3"]
+    let defaults = UserDefaults.standard
+    var itemArray: [TodoItem] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        if let items = defaults.array(forKey: "Data") as? [TodoItem] {
+            itemArray = items
+        }
     }
     
     
@@ -25,8 +27,9 @@ class TodoListViewController: UITableViewController{
         let allert = UIAlertController(title: "Add todo", message: nil, preferredStyle: .alert)
         
         let allertAction = UIAlertAction(title: "add", style: .default) { (action) in
-            print(textField?.text)
-            self.itemArray.append( textField!.text!)
+            let newItem = TodoItem(title: textField!.text!)
+            self.itemArray.append(newItem)
+//            defaults.a
             self.tableView.reloadData()
             
         }
@@ -55,21 +58,17 @@ class TodoListViewController: UITableViewController{
        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
        
        // Configure the cell’s contents.
-        cell.textLabel!.text = itemArray[indexPath.row]
+        let item = itemArray[indexPath.row]
+        cell.textLabel!.text = item.title
+        cell.accessoryType =  item.isDone ?.checkmark : .none
            
        return cell
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(itemArray[indexPath.row])
-        
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        } else {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
-       
-        
+        let item = itemArray[indexPath.row]
+        item.isDone = !item.isDone
+        tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
 }
