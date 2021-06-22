@@ -1,24 +1,17 @@
-//
-//  ViewController.swift
-//  Todoey
-//
-//  Created by Philipp Muellauer on 02/12/2019.
-//  Copyright © 2019 App Brewery. All rights reserved.
-//
+ 
 
 import UIKit
+import CoreData
 
 class TodoListViewController: UITableViewController{
-    let defaults = UserDefaults.standard
-    var itemArray: [TodoItem] = []
+    var itemArray: [Item] = []
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        if let items = defaults.array(forKey: "Data") as? [TodoItem] {
-            itemArray = items
-        }
+        loadItems()
     }
-    
+  
     
     @IBAction func addTodoAction(_ sender: Any) {
         
@@ -27,10 +20,12 @@ class TodoListViewController: UITableViewController{
         let allert = UIAlertController(title: "Add todo", message: nil, preferredStyle: .alert)
         
         let allertAction = UIAlertAction(title: "add", style: .default) { (action) in
-            let newItem = TodoItem(title: textField!.text!)
+            
+            let newItem = Item(context: self.context)
+            newItem.title = textField?.text!
+            newItem.isDone = false
             self.itemArray.append(newItem)
-//            defaults.a
-            self.tableView.reloadData()
+            self.saveItem();
             
         }
         allert.addAction(allertAction
@@ -53,14 +48,18 @@ class TodoListViewController: UITableViewController{
     
     // Provide a cell object for each row.
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-       // Fetch a cell of the appropriate type.
-        
        let cell = tableView.dequeueReusableCell(withIdentifier: "TodoItemCell", for: indexPath)
-       
-       // Configure the cell’s contents.
         let item = itemArray[indexPath.row]
+        let attributedText : NSMutableAttributedString =  NSMutableAttributedString(string: item.title!)
+        attributedText.addAttributes([
+                        NSAttributedString.Key.strikethroughStyle: NSUnderlineStyle.single.rawValue,
+                        NSAttributedString.Key.strikethroughColor: UIColor.lightGray,
+                        NSAttributedString.Key.font : UIFont.systemFont(ofSize: 12.0)
+                        ], range: NSMakeRange(0, attributedText.length))
         cell.textLabel!.text = item.title
+    
         cell.accessoryType =  item.isDone ?.checkmark : .none
+        
            
        return cell
     }
@@ -68,8 +67,32 @@ class TodoListViewController: UITableViewController{
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = itemArray[indexPath.row]
         item.isDone = !item.isDone
+        
+        
         tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
+        saveItem()
+    }
+    
+    func saveItem(){
+        do {
+            
+          try  self.context.save()
+        } catch {
+            print("Error saving context \(error)")
+        }
+        self.tableView.reloadData()
+    }
+    
+    func loadItems() {
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        do{
+            self.itemArray = try context.fetch(request)
+            
+        } catch {
+            print("Error loading context \(error)")
+        }
     }
 }
+
 
