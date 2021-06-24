@@ -52,7 +52,7 @@
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = itemArray[indexPath.row]
         item.isDone = !item.isDone
-        // tableView.deselectRow(at: indexPath, animated: true)
+         tableView.deselectRow(at: indexPath, animated: true)
         saveItem()
     }
     
@@ -85,10 +85,17 @@
         search(searchBar.text!)
     }
     
-    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if(searchBar.text!.isEmpty) {
+            DispatchQueue.main.async {
+                
+                searchBar.resignFirstResponder();
+            }
+        }
         search(searchBar.text!)
+        
     }
-    
+ 
     func search(_ text: String){
         if(!searchBar.text!.isEmpty) {
             request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
