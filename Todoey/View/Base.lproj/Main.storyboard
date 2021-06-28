@@ -40,7 +40,7 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <segue destination="Fb9-4M-PHN" kind="show" identifier="showItemsPage" id="bLJ-M9-cZU"/>
+                        <segue destination="Fb9-4M-PHN" kind="show" identifier="itemsPage" id="bLJ-M9-cZU"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6CA-pS-wgS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
