@@ -79,6 +79,7 @@
             let predicate1 = NSPredicate(format: "parentCategory.title MATCHES %@", selectedCategoty!.title!)
             compound = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate1])
             if(!searchText.isEmpty) {
+                
                 let predicate2 = NSPredicate(format: "title CONTAINS[cd] %@", searchText)
                 compound = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate1, predicate2])
                 request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
