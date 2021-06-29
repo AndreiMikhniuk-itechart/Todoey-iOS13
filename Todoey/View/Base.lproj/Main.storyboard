@@ -39,13 +39,10 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <connections>
-                        <segue destination="Fb9-4M-PHN" kind="show" identifier="itemsPage" id="bLJ-M9-cZU"/>
-                    </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6CA-pS-wgS" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1838" y="124"/>
+            <point key="canvasLocation" x="1948" y="623"/>
         </scene>
         <!--Items-->
         <scene sceneID="8gG-cY-p6u">
@@ -106,7 +103,7 @@
                     </navigationBar>
                     <nil name="viewControllers"/>
                     <connections>
-                        <segue destination="iWo-Tn-JXY" kind="relationship" relationship="rootViewController" id="xuZ-2C-2zc"/>
+                        <segue destination="Fb9-4M-PHN" kind="relationship" relationship="rootViewController" id="FWY-b5-ueh"/>
                     </connections>
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Wed-qg-JOa" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

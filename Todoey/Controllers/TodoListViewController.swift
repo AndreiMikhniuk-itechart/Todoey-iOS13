@@ -2,17 +2,19 @@
  
  import UIKit
  import CoreData
+ import RealmSwift
  
  class TodoListViewController: UITableViewController {
+    let localRealm = try! Realm()
     
     var selectedCategoty: CategoryItem? {
         didSet {
-            loadItems(withFilter: "")
+//            loadItems(withFilter: "")
         }
     }
     
     
-    var itemArray: [Item] = []
+    var itemArray: [ItemRealm] = []
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     
@@ -20,6 +22,8 @@
     override func viewDidLoad() {
         super.viewDidLoad()
         searchBar.delegate = self
+        // Get all tasks in the realm
+        itemArray = Array(localRealm.objects(ItemRealm.self))
     }
     
     
@@ -27,12 +31,13 @@
         var textField: UITextField?
         let allert = UIAlertController(title: "Add todo", message: nil, preferredStyle: .alert)
         let allertAction = UIAlertAction(title: "add", style: .default) { (action) in
-            let newItem = Item(context: self.context)
-            newItem.title = textField?.text!
-            newItem.isDone = false
-            newItem.parentCategory = self.selectedCategoty
-            self.itemArray.append(newItem)
-            self.saveItem();
+            
+            if let newTodo =  textField?.text {
+                let itemRealm = ItemRealm(title: newTodo)
+                self.itemArray.append(itemRealm)
+                self.saveItem(itemRealm)
+            
+            }
         }
         allert.addAction(allertAction)
         allert.addTextField(
@@ -60,39 +65,37 @@
         let item = itemArray[indexPath.row]
         item.isDone = !item.isDone
         tableView.deselectRow(at: indexPath, animated: true)
-        saveItem()
+//        saveItem()
     }
     
-    func saveItem(){
-        do {
-            try  self.context.save()
-        } catch {
-            print("Error saving context \(error)")
+    func saveItem(_ newItem: ItemRealm){
+        try! self.localRealm.write {
+            self.localRealm.add(newItem)
         }
         self.tableView.reloadData()
     }
     
-    func loadItems(withFilter searchText: String) {
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
-        var compound : NSCompoundPredicate
-        if (selectedCategoty != nil) {
-            let predicate1 = NSPredicate(format: "parentCategory.title MATCHES %@", selectedCategoty!.title!)
-            compound = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate1])
-            if(!searchText.isEmpty) {
-                
-                let predicate2 = NSPredicate(format: "title CONTAINS[cd] %@", searchText)
-                compound = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate1, predicate2])
-                request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-            }
-            request.predicate = compound
-            do {
-                self.itemArray = try context.fetch(request)
-            } catch {
-                print("Error loading context \(error)")
-            }
-            tableView.reloadData()
-        }
-    }
+//    func loadItems(withFilter searchText: String) {
+//        let request : NSFetchRequest<Item> = Item.fetchRequest()
+//        var compound : NSCompoundPredicate
+//        if (selectedCategoty != nil) {
+//            let predicate1 = NSPredicate(format: "parentCategory.title MATCHES %@", selectedCategoty!.title!)
+//            compound = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate1])
+//            if(!searchText.isEmpty) {
+//
+//                let predicate2 = NSPredicate(format: "title CONTAINS[cd] %@", searchText)
+//                compound = NSCompoundPredicate(andPredicateWithSubpredicates: [predicate1, predicate2])
+//                request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+//            }
+//            request.predicate = compound
+//            do {
+//                self.itemArray = try context.fetch(request)
+//            } catch {
+//                print("Error loading context \(error)")
+//            }
+//            tableView.reloadData()
+//        }
+//    }
  }
  
  //MARK: - Search bar methods
@@ -100,7 +103,7 @@
  extension TodoListViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        loadItems(withFilter:  searchBar.text!)
+//        loadItems(withFilter:  searchBar.text!)
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
@@ -109,6 +112,6 @@
                 searchBar.resignFirstResponder();
             }
         }
-        loadItems(withFilter: searchBar.text!)
+//        loadItems(withFilter: searchBar.text!)
     }
  }
